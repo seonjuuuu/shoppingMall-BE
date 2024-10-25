@@ -5,7 +5,7 @@ const userController = {};
 
 userController.createdUser = async (req, res) => {
   try {
-    const { email, password, nickname, level } = req.body;
+    const { email, password, name, level } = req.body;
     const user = await User.findOne({ email });
     if (user) {
       return res
@@ -18,7 +18,7 @@ userController.createdUser = async (req, res) => {
     const newUser = new User({
       email,
       password: hashedPassword,
-      nickname,
+      name,
       level,
     });
     await newUser.save();
