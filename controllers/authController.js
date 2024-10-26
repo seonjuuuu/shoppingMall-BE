@@ -1,5 +1,8 @@
 const authController = {};
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 const bcrypt = require('bcryptjs');
 
 authController.loginEmail = async (req, res, next) => {
@@ -23,6 +26,30 @@ authController.loginEmail = async (req, res, next) => {
 
     const token = await user.generateToken();
     return res.status(200).json({ status: 'success', user, token });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+authController.authenticate = (req, res, next) => {
+  try {
+    const tokenString = req.headers.authorization;
+    if (!tokenString) {
+      const error = new Error('토큰이 없습니다.');
+      error.status = 401;
+      throw error;
+    }
+    const token = tokenString.replace('Bearer ', '');
+    jwt.verify(token, JWT_SECRET_KEY, (error, payload) => {
+      if (error) {
+        const error = new Error('유효한 토큰이 아닙니다.');
+        error.status = 401;
+        throw error;
+      }
+      req.userId = payload._id;
+      next();
+    });
   } catch (error) {
     console.error(error);
     next(error);
