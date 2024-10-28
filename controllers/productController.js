@@ -34,4 +34,20 @@ productController.createProduct = async (req, res, next) => {
   }
 };
 
+productController.getProduct = async (req, res, next) => {
+  try {
+    const product = await Product.find({});
+
+    if (!product) {
+      const error = new Error('제품이 없습니다.');
+      error.status = 404;
+      return next(error);
+    }
+    res.status(200).json({ status: 'success', data: product });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
 module.exports = productController;
