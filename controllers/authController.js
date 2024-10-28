@@ -59,6 +59,7 @@ authController.authenticate = (req, res, next) => {
 authController.checkAdminPermission = async (req, res, next) => {
   try {
     const { userId } = req;
+    console.log(userId);
     const user = await User.findById(userId);
     if (user.level !== 'admin') {
       const error = new Error('어드민 레벨이 아닙니다.');
