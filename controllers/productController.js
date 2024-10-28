@@ -53,9 +53,7 @@ productController.getProduct = async (req, res, next) => {
     response.data = productList;
 
     if (!productList || productList.length === 0) {
-      const error = new Error('제품이 없습니다.');
-      error.status = 404;
-      return next(error);
+      response.data = [];
     }
     res.status(200).json(response);
   } catch (error) {
