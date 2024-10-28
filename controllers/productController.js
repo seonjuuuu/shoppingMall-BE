@@ -15,6 +15,7 @@ productController.createProduct = async (req, res, next) => {
       price,
       stock,
       status,
+      discountPrice,
     } = req.body;
     const product = new Product({
       sku,
@@ -26,6 +27,7 @@ productController.createProduct = async (req, res, next) => {
       price,
       stock,
       status,
+      discountPrice,
     });
     await product.save();
     res.status(200).json({ status: 'success', product });
@@ -75,11 +77,23 @@ productController.updateProduct = async (req, res, next) => {
       price,
       stock,
       status,
+      discountPrice,
     } = req.body;
 
     const product = await Product.findByIdAndUpdate(
       productId,
-      { sku, name, size, image, category, description, price, stock, status },
+      {
+        sku,
+        name,
+        size,
+        image,
+        category,
+        description,
+        price,
+        stock,
+        status,
+        discountPrice,
+      },
       { new: true }
     );
     if (!product) {
