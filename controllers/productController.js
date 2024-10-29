@@ -46,7 +46,11 @@ productController.createProduct = async (req, res, next) => {
 productController.getProduct = async (req, res, next) => {
   try {
     const { page, name } = req.query;
-    const cond = name ? { name: { $regex: name, $options: 'i' } } : {};
+    const cond = { isDeleted: false };
+    if (name) {
+      cond.name = { $regex: name, $options: 'i' };
+    }
+
     let response = { status: 'success' };
     let query = Product.find(cond).sort({ createdAt: -1 });
 
@@ -117,7 +121,11 @@ productController.updateProduct = async (req, res, next) => {
 productController.deleteProduct = async (req, res, next) => {
   try {
     const productId = req.params.id;
-    const product = await Product.findByIdAndDelete(productId);
+    const product = await Product.findByIdAndUpdate(
+      productId,
+      { isDeleted: true },
+      { new: true }
+    );
 
     if (!product) {
       const error = new Error('상품이 존재하지 않습니다.');
