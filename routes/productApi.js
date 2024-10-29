@@ -27,4 +27,6 @@ router.delete(
 
 router.get('/delete', productController.getDeleteProduct);
 
+router.get('/:id', productController.getProductDetail);
+
 module.exports = router;
