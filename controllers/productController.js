@@ -166,7 +166,7 @@ productController.getDeleteProduct = async (req, res, next) => {
 productController.getProductDetail = async (req, res, next) => {
   try {
     const productId = req.params.id;
-    const productDetail = await Product.find({ _id: productId });
+    const productDetail = await Product.findById({ _id: productId });
     if (!productDetail) {
       const error = new Error('제품이 없습니다.');
       error.status = 400;
