@@ -33,6 +33,12 @@ productController.createProduct = async (req, res, next) => {
     res.status(200).json({ status: 'success', product });
   } catch (error) {
     console.log(error);
+    if (error.code === 11000 && error.keyPattern && error.keyPattern.sku) {
+      res.status(400).json({
+        status: 'fail',
+        message: '이미 존재하는 sku입니다. 다른 sku를 입력해 주세요.',
+      });
+    }
     next(error);
   }
 };
