@@ -39,10 +39,10 @@ productController.createProduct = async (req, res, next) => {
 
 productController.getProduct = async (req, res, next) => {
   try {
-    const { page = 1, name } = req.query;
+    const { page , name } = req.query;
     const cond = name ? { name: { $regex: name, $options: 'i' } } : {};
     let response = { status: 'success' };
-    let query = Product.find(cond);
+    let query = Product.find(cond).sort({ createdAt: -1 }); ;
 
     if (page) {
       query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
