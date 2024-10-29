@@ -25,4 +25,6 @@ router.delete(
   productController.deleteProduct
 );
 
+router.get('/delete', productController.getDeleteProduct);
+
 module.exports = router;
