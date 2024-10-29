@@ -45,10 +45,10 @@ productController.createProduct = async (req, res, next) => {
 
 productController.getProduct = async (req, res, next) => {
   try {
-    const { page , name } = req.query;
+    const { page, name } = req.query;
     const cond = name ? { name: { $regex: name, $options: 'i' } } : {};
     let response = { status: 'success' };
-    let query = Product.find(cond).sort({ createdAt: -1 }); ;
+    let query = Product.find(cond).sort({ createdAt: -1 });
 
     if (page) {
       query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
@@ -108,6 +108,26 @@ productController.updateProduct = async (req, res, next) => {
       return next(error);
     }
     res.status(200).json({ status: 'success', product });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+productController.deleteProduct = async (req, res, next) => {
+  try {
+    const productId = req.params.id;
+    const product = await Product.findByIdAndDelete(productId);
+
+    if (!product) {
+      const error = new Error('상품이 존재하지 않습니다.');
+      error.status = 400;
+      return next(error);
+    }
+
+    res
+      .status(200)
+      .json({ status: 'success', message: '삭제에 성공하였습니다.' });
   } catch (error) {
     console.log(error);
     next(error);
