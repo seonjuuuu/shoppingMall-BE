@@ -34,4 +34,21 @@ cartController.addItemToCart = async (req, res, next) => {
   }
 };
 
+cartController.getCartItem = async (req, res, next) => {
+  try {
+    const { userId } = req;
+    const cart = await Cart.findOne({ userId }).populate({
+      path: 'items',
+      populate: {
+        path: 'productId',
+        model: 'Product',
+      },
+    });
+    res.status(200).json({ state: 'success', data: cart.items });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
 module.exports = cartController;
