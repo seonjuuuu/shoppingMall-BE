@@ -65,4 +65,22 @@ cartController.getCartQty = async (req, res, next) => {
   }
 };
 
+cartController.deleteCartItem = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req;
+    const cart = await Cart.findOne({ userId });
+
+    cart.items = cart.items.filter((item) => !item._id.equals(id));
+    await cart.save();
+
+    res
+      .status(200)
+      .json({ status: 'success', qty: cart.items.length, data: cart.items });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
 module.exports = cartController;
