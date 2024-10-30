@@ -44,7 +44,21 @@ cartController.getCartItem = async (req, res, next) => {
         model: 'Product',
       },
     });
-    res.status(200).json({ state: 'success', data: cart.items });
+    res.status(200).json({ state: 'success', data: cart ? cart.items : [] });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+cartController.getCartQty = async (req, res, next) => {
+  try {
+    const { userId } = req;
+    const cart = await Cart.findOne({ userId });
+
+    res
+      .status(200)
+      .json({ status: 'success', qty: cart ? cart.items.length : 0 });
   } catch (error) {
     console.log(error);
     next(error);
