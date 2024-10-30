@@ -1,8 +1,6 @@
-const { query } = require('express');
 const Product = require('../models/Product');
 
 const productController = {};
-const PAGE_SIZE = 5;
 
 const setDeleteStatus = async (productId, isDeleted) => {
   return await Product.findByIdAndUpdate(
@@ -12,7 +10,7 @@ const setDeleteStatus = async (productId, isDeleted) => {
   );
 };
 
-const getProduct = async (isDeleted = false, page, name = '') => {
+const getProduct = async (isDeleted = false, page, name = '', limit = 5) => {
   const cond = { isDeleted };
   if (name) {
     cond.name = { $regex: name, $options: 'i' };
@@ -21,9 +19,9 @@ const getProduct = async (isDeleted = false, page, name = '') => {
   let totalPageNum;
 
   if (page) {
-    query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
+    query.skip((page - 1) * limit).limit(limit);
     const totalItemNum = await Product.countDocuments(cond);
-    totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+    totalPageNum = Math.ceil(totalItemNum / limit);
   }
   const productList = await query.exec();
 
@@ -75,8 +73,8 @@ productController.createProduct = async (req, res, next) => {
 
 productController.getProduct = async (req, res, next) => {
   try {
-    const { page, name } = req.query;
-    const response = await getProduct(false, page, name);
+    const { page, name, limit } = req.query;
+    const response = await getProduct(false, page, name, limit);
     res.status(200).json(response);
   } catch (error) {
     console.log(error);
