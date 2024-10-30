@@ -131,11 +131,7 @@ productController.updateProduct = async (req, res, next) => {
 productController.deleteProduct = async (req, res, next) => {
   try {
     const productId = req.params.id;
-    const product = await Product.findByIdAndUpdate(
-      productId,
-      { isDeleted: true },
-      { new: true }
-    );
+    const product = await setDeleteStatus(productId, true);
 
     if (!product) {
       const error = new Error('상품이 존재하지 않습니다.');
