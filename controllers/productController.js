@@ -174,4 +174,26 @@ productController.getProductDetail = async (req, res, next) => {
   }
 };
 
+productController.updateState = async (req, res, next) => {
+  try {
+    const productId = req.params.id;
+    const { status } = req.body;
+
+    const product = await Product.findByIdAndUpdate(
+      productId,
+      { status },
+      { new: true }
+    );
+    if (!product) {
+      const error = new Error('상품이 없습니다.');
+      error.status = 404;
+      return next(error);
+    }
+    res.status(200).json({ status: 'success', data: product });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
 module.exports = productController;

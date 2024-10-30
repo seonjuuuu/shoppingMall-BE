@@ -29,4 +29,11 @@ router.get('/delete', productController.getDeleteProduct);
 
 router.get('/:id', productController.getProductDetail);
 
+router.put(
+  '/status/:id',
+  authController.authenticate,
+  authController.checkAdminPermission,
+  productController.updateState
+);
+
 module.exports = router;
