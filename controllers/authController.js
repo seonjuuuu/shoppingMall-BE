@@ -36,14 +36,14 @@ authController.authenticate = (req, res, next) => {
   try {
     const tokenString = req.headers.authorization;
     if (!tokenString) {
-      const error = new Error('토큰이 없습니다.');
+      const error = new Error('로그인 정보가 없습니다.');
       error.status = 401;
       throw error;
     }
     const token = tokenString.replace('Bearer ', '');
     jwt.verify(token, JWT_SECRET_KEY, (error, payload) => {
       if (error) {
-        const error = new Error('유효한 토큰이 아닙니다.');
+        const error = new Error('로그인 정보가 없습니다.');
         error.status = 401;
         throw error;
       }
