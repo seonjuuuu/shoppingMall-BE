@@ -17,6 +17,9 @@ const orderSchema = Schema(
       type: Object,
       required: true,
     },
+    orderNum: {
+      type: String,
+    },
     items: [
       {
         productId: {
