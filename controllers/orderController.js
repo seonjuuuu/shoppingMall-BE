@@ -38,10 +38,43 @@ orderController.createOrder = async (req, res, next) => {
 orderController.getOders = async (req, res, next) => {
     try {
         const { userId } = req;
-        const orders = await Order.find({userId}).populate({
-            path: 'items.productId',
-        });
-        res.status(200).json({status: 'success', orders});
+        const { page, ordernum, limit = 3} = req.query;
+
+        const query = { userId };
+        if (ordernum) {
+            query.orderNum = { $regex: ordernum, $options: 'i' };
+        }
+        
+        const totalOrders = await Order.countDocuments(query);
+        let orders; 
+
+        if(page) {
+            const totalPageNum = Math.ceil(totalOrders / limit);
+            orders = await Order.find(query).populate('userId', 'name email').populate({
+                path: 'items.productId',
+            })
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .exec();
+
+
+            res.status(200).json({
+                status: 'success',
+                orders,
+                total: totalOrders,
+                pages: totalPageNum
+            });
+        } else {
+            orders = await Order.find(query).populate({
+                path: 'items.productId',
+            }).sort({ createdAt: -1 }).exec();
+            res.status(200).json({
+                status: 'success',
+                orders,
+                total: totalOrders
+            });
+        }
     } catch(error) {
         console.log(error);
         next(error);

@@ -47,6 +47,10 @@ const orderSchema = Schema(
       required: true,
       default: 0,
     },
+    status: {
+      type: String,
+      default: 'preparing'
+    }
   },
   { timestamps: true }
 );
