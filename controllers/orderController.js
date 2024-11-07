@@ -9,26 +9,39 @@ orderController.createOrder = async (req, res, next) => {
         const {userId} = req;
         const {shipTo, contact, orderList, totalPrice} = req.body;
         const insufficientStockItems = await productController.checkItemListStock(orderList);
+        console.log('insufficientStockItems:', insufficientStockItems); 
 
         if(insufficientStockItems.length > 0) {
             const errorMessage = insufficientStockItems.reduce((total, item) => total += item.message, '');
             const error = new Error(errorMessage);
             error.status = 400;
             return next(error);
+        } else {
+            const orderNum = randomStringGenerator();
+
+            const newOrder = new Order({
+                userId,
+                shipTo,
+                contact,
+                items: orderList,
+                totalPrice,
+                orderNum
+            });
+            await newOrder.save();
+            res.status(200).json({state: 'success', orderNum: orderNum});
         }
-        const orderNum = randomStringGenerator();
 
-        const newOrder = new Order({
-            userId,
-            shipTo,
-            contact,
-            items: orderList,
-            totalPrice,
-            orderNum
-        });
-        await newOrder.save();
-        res.status(200).json({state: 'success', orderNum: orderNum});
-
+    } catch(error) {
+        console.log(error);
+        next(error);
+    }
+}
+orderController.getOders = async (req, res, next) => {
+    try {
+        const { userId } = req;
+        const orders = await Order.find({userId});
+        console.log('orders:', orders); 
+        res.status(200).json({status: 'success', orders});
     } catch(error) {
         console.log(error);
         next(error);

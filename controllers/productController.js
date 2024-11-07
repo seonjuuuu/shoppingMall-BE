@@ -195,31 +195,36 @@ productController.updateState = async (req, res, next) => {
     next(error);
   }
 };
-
 productController.checkStock = async (item) => {
-  const product = await Product.findById(item.productId);  
-  if(product.stock[item.size] < item.qty) {
-    return {isVerify: false, message: `${product.name}의 ${item.size} 사이즈 재고가 부족합니다.`};
-  } 
-  const newStock = {...product.stock};
-  newStock[item.size] -= item.qty
-  product.stock = newStock;
-  await product.save();
-  return {isVerify: true};
-}
+  const product = await Product.findById(item.productId);
+  if (product && product.stock[item.size] < item.qty) {
+    return { isVerify: false, message: `${product.name}의 ${item.size} 사이즈 재고가 부족합니다.` };
+  }
+  return { isVerify: true, product }; 
+};
 
 productController.checkItemListStock = async (orderList) => {
   const insufficientStockItems = [];
+  const productsToUpdate = [];
 
-  await Promise.all(
-    orderList.map(async (item) => {
-      const stockCheck = await productController.checkStock(item);
-      if(!stockCheck.isVerify) {
-        insufficientStockItems.push({productId: item.productId, message: stockCheck.message});
-      }
-      return stockCheck;
-  }));
-  return insufficientStockItems;
-}
+  for (const item of orderList) {
+    const stockCheck = await productController.checkStock(item);
+    if (!stockCheck.isVerify) {
+      insufficientStockItems.push({ productId: item.productId, message: stockCheck.message });
+    } else {
+      productsToUpdate.push({ product: stockCheck.product, size: item.size, qty: item.qty });
+    }
+  }
 
+  if (insufficientStockItems.length > 0) {
+    return insufficientStockItems;
+  }
+
+  for (const { product, size, qty } of productsToUpdate) {
+    product.stock[size] -= qty;
+    await product.save();
+  }
+
+  return insufficientStockItems; 
+};
 module.exports = productController;
