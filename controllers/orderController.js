@@ -38,8 +38,9 @@ orderController.createOrder = async (req, res, next) => {
 orderController.getOders = async (req, res, next) => {
     try {
         const { userId } = req;
-        const orders = await Order.find({userId});
-        console.log('orders:', orders); 
+        const orders = await Order.find({userId}).populate({
+            path: 'items.productId',
+        });
         res.status(200).json({status: 'success', orders});
     } catch(error) {
         console.log(error);
